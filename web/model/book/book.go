@@ -1,6 +1,8 @@
 package book
 
 import (
+	"web/model"
+
 	"gorm.io/gorm"
 )
 
@@ -11,6 +13,10 @@ type Book struct {
 
 type BookDAO struct {
 	DB *gorm.DB
+}
+
+func NewBookDAO() BookDAO {
+	return BookDAO{DB: model.DB2()}
 }
 
 func (Book) TableName() string {
@@ -25,13 +31,10 @@ func (dao *BookDAO) Insert(book Book) int64 {
 	return book.ID
 }
 
-func (dao *BookDAO) GetByID(id int64) Book {
+func (dao *BookDAO) GetByID(id int64) (Book, error) {
 	var book Book
 	result := dao.DB.Where("id = ?", id).First(&book)
-	if result.Error != nil {
-		panic(result.Error)
-	}
-	return book
+	return book, result.Error
 }
 
 func (dao *BookDAO) GetByIDs(ids []int64) []Book {

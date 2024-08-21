@@ -13,7 +13,7 @@ func TestBookDAO(t *testing.T) {
 	tx := model.DB2().Begin()
 	book_dao := book_model.BookDAO{DB: tx}
 	book_id := book_dao.Insert(book_model.Book{Title: "test"})
-	book := book_dao.GetByID(book_id)
+	book, _ := book_dao.GetByID(book_id)
 	assert.Equal(t, "test", book.Title)
 
 	book_id2 := book_dao.Insert(book_model.Book{Title: "test2"})

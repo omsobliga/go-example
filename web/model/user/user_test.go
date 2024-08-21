@@ -11,7 +11,7 @@ func TestUserDAO(t *testing.T) {
 	user_dao := user_model.UserDAO{}
 	user_id := user_dao.Insert("test", 10)
 
-	user := user_dao.GetByID(user_id)
+	user, _ := user_dao.GetByID(user_id)
 	assert.Equal(t, "test", user.Name)
 	assert.Equal(t, int32(10), user.Age)
 

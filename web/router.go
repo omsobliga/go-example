@@ -10,6 +10,7 @@ import (
 func GetRouter() *gin.Engine {
 	router := gin.Default()
 	router.GET("/users/:id", user.UserHandler)
+	router.GET("/async/users/:id", user.AsyncUserHandler)
 	router.GET("/books/:id", book.BookHandler)
 	return router
 }

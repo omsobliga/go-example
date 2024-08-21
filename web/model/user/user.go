@@ -13,7 +13,11 @@ type User struct {
 
 type UserDAO struct{}
 
-func (UserDAO) Insert(name string, age int32) int64 {
+func NewUserDAO() *UserDAO {
+	return &UserDAO{}
+}
+
+func (userDAO *UserDAO) Insert(name string, age int32) int64 {
 	sqlStr := "insert into user(name, age) values (?,?)"
 	ret, err := model.DB().Exec(sqlStr, name, age)
 	if err != nil {
@@ -26,17 +30,23 @@ func (UserDAO) Insert(name string, age int32) int64 {
 	return theID
 }
 
-func (UserDAO) GetByID(id int64) User {
+func (userDAO *UserDAO) GetByID(id int64) (User, error) {
 	sqlStr := "select id, name, age from user where id=?"
 	var u User
-	err := model.DB().QueryRow(sqlStr, 1).Scan(&u.ID, &u.Name, &u.Age)
-	if err != nil {
-		panic(err)
-	}
-	return u
+	err := model.DB().QueryRow(sqlStr, id).Scan(&u.ID, &u.Name, &u.Age)
+	return u, err
 }
 
-func (UserDAO) GetByIDs(ids []int64) []User {
+func (userDAO *UserDAO) AsyncGetByID(id int64, chUser chan<- *User) {
+	user, err := userDAO.GetByID(id)
+	if err != nil {
+		chUser <- &user
+	} else {
+		chUser <- nil
+	}
+}
+
+func (userDAO *UserDAO) GetByIDs(ids []int64) []User {
 	sqlStr := "select id, name, age from user where id in (?" + strings.Repeat(",?", len(ids)-1) + ")"
 	args := make([]interface{}, len(ids))
 	for i, id := range ids {
