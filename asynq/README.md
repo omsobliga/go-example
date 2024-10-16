@@ -1,11 +1,11 @@
 # producer
 
 ```
-go run producer/producer.go
+go run producer/main.go
 ```
 
 # worker
 
 ```
-go run worker/worker.go
+go run worker/main.go
 ```
