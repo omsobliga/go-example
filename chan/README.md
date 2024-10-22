@@ -1,0 +1,2 @@
+- https://gfw.go101.org/article/channel-use-cases.html
+- https://gfw.go101.org/article/channel-closing.html
