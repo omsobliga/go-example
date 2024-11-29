@@ -1,1 +1,2 @@
-protobuf-tutorial/genpb/addressbook.pb.go
+*.pb.go
+.idea
