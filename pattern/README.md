@@ -1,1 +1,3 @@
-参考 https://github.com/tmrts/go-patterns
+References
+
+- https://github.com/tmrts/go-patterns

@@ -1,32 +1,31 @@
-// 同时等待多个通道操作
+/*
+select 的用法：
+- 如果case关键字后跟随的是一个发送操作，则此select代码块为一个尝试发送操作。 如果case分支的发送操作是阻塞的，则default分支将被执行，发送失败；否则发送成功，case分支得到执行。
+- 如果case关键字后跟随的是一个接收操作，则此select代码块为一个尝试接收操作。 如果case分支的接收操作是阻塞的，则default分支将被执行，接收失败；否则接收成功，case分支得到执行。
+*/
 package main
 
-import (
-	"fmt"
-	"time"
-)
-
-func worker1(c chan string) {
-	time.Sleep(time.Second)
-	c <- "worker1"
-}
-
-func worker2(c chan string) {
-	time.Sleep(2 * time.Second)
-	c <- "worker2"
-}
+import "fmt"
 
 func main() {
-	chan1 := make(chan string, 1)
-	chan2 := make(chan string, 2)
-	go worker1(chan1)
-	go worker2(chan2)
-	for i := 0; i < 2; i++ {
+	type Book struct{id int}
+	bookshelf := make(chan Book, 3)
+
+	for i := 0; i < cap(bookshelf) * 2; i++ {
 		select {
-		case msg := <-chan1:
-			fmt.Println(msg)
-		case msg := <-chan2:
-			fmt.Println(msg)
+		case bookshelf <- Book{id: i}:
+			fmt.Println("成功将书放在书架上", i)
+		default:
+			fmt.Println("书架已经被占满了")
+		}
+	}
+
+	for i := 0; i < cap(bookshelf) * 2; i++ {
+		select {
+		case book := <-bookshelf:
+			fmt.Println("成功从书架上取下一本书", book.id)
+		default:
+			fmt.Println("书架上已经没有书了")
 		}
 	}
 }

@@ -1,34 +1,32 @@
+// 示例：使用 select 实现超时机制
 package main
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 )
 
+func request(c chan<- int) {
+	time.Sleep(time.Second * 3)
+	c <- rand.Intn(100)
+}
+
+func requestWithTimeout(timeout time.Duration) {
+	c := make(chan int)
+	go request(c)
+
+	select {
+	case data := <-c:
+		fmt.Println(data, "done")
+	case <-time.After(timeout):
+		fmt.Println("timeout")
+	}
+}
+
 func main() {
-	ch1 := make(chan string, 1)
-	go func() {
-		time.Sleep(time.Second * 2)
-		ch1 <- "result1"
-	}()
-
-	select {
-	case msg := <-ch1:
-		fmt.Println(msg)
-	case <-time.After(time.Second * 1):
-		fmt.Println("timeout1")
-	}
-
-	ch2 := make(chan string, 1)
-	go func() {
-		time.Sleep(time.Second * 2)
-		ch2 <- "result2"
-	}()
-
-	select {
-	case msg := <-ch2:
-		fmt.Println(msg)
-	case <-time.After(time.Second * 3):
-		fmt.Println("timeout2")
-	}
+	requestWithTimeout(time.Second)
+	requestWithTimeout(time.Second * 2)
+	requestWithTimeout(time.Second * 3)
+	requestWithTimeout(time.Second * 4)
 }
